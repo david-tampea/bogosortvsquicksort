@@ -116,9 +116,7 @@ int main()
     {
         if(opt==1) i=w;//practic asa dam si skip la for
         unsigned long long fact = 1;
-        for (int t = 2; t <= i; t++) {
-            fact *= t;
-        }
+        for (int t = 2; t <= i; t++) fact*=t;
         int arr[i],arraux[i],arrauxaux[i];
         gen_rand_arr(i,arr,NMAX,dist);
 
@@ -138,9 +136,9 @@ int main()
         double est=fact/sps;//estimated time = estimated iterations over iterations per second
         printf("Timp estimat: ");//Doar aici ma duc mai sus de ani, deoarece nu cred ca ruleaza cineva programul asta mai mult de 10 ani, dar macar sa stie un estimated time
         
-        if(est>=(60*60*24*365.25*1000)) printf("%f milenii.\n",est/(60*60*24*365.25));
-        else if(est>=(60*60*24*365.25*100)) printf("%f secole.\n",est/(60*60*24*365.25));
-        else if(est>=(60*60*24*365.25*10)) printf("%f decenii.\n",est/(60*60*24*365.25));
+        if(est>=(60*60*24*365.25*1000)) printf("%f milenii.\n",est/(60*60*24*365.25*1000));
+        else if(est>=(60*60*24*365.25*100)) printf("%f secole.\n",est/(60*60*24*365.25*100));
+        else if(est>=(60*60*24*365.25*10)) printf("%f decenii.\n",est/(60*60*24*365.25*10));
         else if(est>=(60*60*24*365.25)) printf("%f ani.\n",est/(60*60*24*365.25));
         else if(est>=(60*60*24*30)) printf("%f luni.\n",est/(60*60*24*30));
         else if(est>=(60*60*24*7)) printf("%f saptamani.\n",est/(60*60*24*7));
