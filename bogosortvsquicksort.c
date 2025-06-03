@@ -131,7 +131,7 @@ int main()
         afis(i,arr);
 
         start = clock();
-        for(int j=0; j<100000; j++) shuffle(arrauxaux,i);//am luat 100000 ca mi se pare suficient
+        for(int j=0; j<100000; j++) {shuffle(arrauxaux,i); is_sorted(arrauxaux,i);}//am luat 100000 ca mi se pare suficient. chiar daca ignoram return value-ul de la issorted  tot e mai bine sa il punem ca face parte din bogosort si ne da o estimare mai buna
         end = clock();
         cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
         double sps=100000/cpu_time_used;//shuffles/second
