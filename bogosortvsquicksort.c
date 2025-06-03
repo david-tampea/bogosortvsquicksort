@@ -8,8 +8,7 @@ int compare_ints(const void *a, const void *b) {
     int int_a = *(int *)a;
     int int_b = *(int *)b;
 
-    return (int_a > int_b) - (int_a < int_b); // adică: 1, 0 sau -1
-    // Sau simplu: return int_a - int_b; (dar poate da overflow la int-uri mari)
+    return (int_a > int_b) - (int_a < int_b); 
 }
 
 int is_sorted(int arr[], int n) {
