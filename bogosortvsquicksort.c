@@ -82,16 +82,29 @@ int main()
     srand(time(NULL));
     clock_t start, end;
     double cpu_time_used, qs;
-    int w=0,iter=0, NMAX=0,dist=0;
-    printf("Numerele generate vor fi de la 1 la: ");
-    while(NMAX<10)
+    int w=0,iter=0, NMAX=0,dist=-1;
+    printf("Ati dori sa incercati bogosort pe:\n1.Un singur array generat aleator\n2.Incepand de la 2 elemente pana la un numar decis de dvs\noptiune: ");
+    int opt=0;
+    while(opt!=1&&opt!=2)
+    {
+        scanf("%d",&opt);
+        if(opt!=1&&opt!=2) printf("1 sau 2!\noptiune: ");
+    }
+    printf("Numerele generate vor fi de la 0 la: ");
+    while(NMAX<4)
     {
         scanf("%d",&NMAX);
-        if(NMAX<10) printf("Minim 10! De la 1 la: ");
+        if(NMAX<4) printf("Minim 4! De la 0 la: ");
     }
+    NMAX++;//ca ia pana la NMAX exclusiv si noi am spus utilizatorului inclusiv
     printf("Doriti numere distincte? 0-nu 1-da: ");
-    scanf("%d",&dist);
-    printf("De la 2 pana la un sir de cate elemente doriti sa mergeti?\nans: ");
+    while(dist!=0&&dist!=1)
+    {
+        scanf("%d",&dist);
+        if(dist!=0&&dist!=1) printf("0 sau 1!\noptiune: ");
+    }
+    if(opt==1)printf("Un sir de cate elemente aleatoare doriti sa ordonati?\nans: ");
+    if(opt==2)printf("De la 2 pana la un sir de cate elemente aleatoare doriti sa mergeti?\nans: ");
     while(w<3||((w>(NMAX-1))&&dist!=0))
     {
         scanf("%d",&w);
@@ -101,15 +114,46 @@ int main()
     printf("\n");
     for(int i=2; i<=w; i++)
     {
-        int arr[i],arraux[i];
+        if(opt==1) i=w;//practic asa dam si skip la for
+        unsigned long long fact = 1;
+        for (int t = 2; t <= i; t++) {
+            fact *= t;
+        }
+        int arr[i],arraux[i],arrauxaux[i];
         gen_rand_arr(i,arr,NMAX,dist);
 
         for(int j=0; j<i; j++)
         {
-            arraux[j]=arr[j];
+            arraux[j]=arr[j];//pt qsort
+            arrauxaux[j]=arr[j];//pt estimated time
         }
         printf("Sir de %d elemente amestecat: \n",i);
         afis(i,arr);
+
+        start = clock();
+        for(int j=0; j<100000; j++) shuffle(arrauxaux,i);//am luat 100000 ca mi se pare suficient
+        end = clock();
+        cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+        double sps=100000/cpu_time_used;//shuffles/second
+        double est=fact/sps;//estimated time = estimated iterations over iterations per second
+        printf("Timp estimat: ");//Doar aici ma duc mai sus de ani, deoarece nu cred ca ruleaza cineva programul asta mai mult de 10 ani, dar macar sa stie un estimated time
+        
+        if(est>=(60*60*24*365.25*1000)) printf("%f milenii.\n",est/(60*60*24*365.25));
+        else if(est>=(60*60*24*365.25*100)) printf("%f secole.\n",est/(60*60*24*365.25));
+        else if(est>=(60*60*24*365.25*10)) printf("%f decenii.\n",est/(60*60*24*365.25));
+        else if(est>=(60*60*24*365.25)) printf("%f ani.\n",est/(60*60*24*365.25));
+        else if(est>=(60*60*24*30)) printf("%f luni.\n",est/(60*60*24*30));
+        else if(est>=(60*60*24*7)) printf("%f saptamani.\n",est/(60*60*24*7));
+        else if(est>=(60*60*24)) printf("%f zile.\n",est/(60*60*24));
+        else if(est>=(60*60)) printf("%f ore.\n",est/(60*60));
+        else if(est>=60) printf("%f minute.\n",est/60);
+        else if(est>1) printf("%f secunde.\n",est);
+        else if(est>0.001) printf("%f milisecunde.\n",1000*(est));
+        else if(est>0.000001) printf("%f microsecunde.\n",1000000*(est));
+        else if(est>0.000000001) printf("%f nanosecunde.\n",1000000000*(est));
+        else if(est!=0) printf("%f picosecunde.\n",1000000000000*(est));
+        else if(est==0)printf("instant.\n");
+        
         start = clock();
         iter=bogosort(arr,i);
         end = clock();
@@ -117,16 +161,30 @@ int main()
         afis(i,arr);
         cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
 
-        if(cpu_time_used>1) printf("PENTRU %d ELEMENTE BOGOSORT A DURAT %f SECUNDE!\n",i,cpu_time_used);
-        else if(cpu_time_used>0.001) printf("PENTRU %d ELEMENTE BOGOSORT A DURAT %f MILISECUNDE!\n",i,1000*(cpu_time_used));
-        else if(cpu_time_used>0.000001) printf("PENTRU %d ELEMENTE BOGOSORT A DURAT %f MICROSECUNDE!\n",i,1000000*(cpu_time_used));
-        else if(cpu_time_used>0.000000001) printf("PENTRU %d ELEMENTE BOGOSORT A DURAT %f NANOOSECUNDE!\n",i,1000000000*(cpu_time_used));
-        else if(cpu_time_used!=0) printf("PENTRU %d ELEMENTE BOGOSORT A DURAT %f PICOSECUNDE!\n",i,1000000000000*(cpu_time_used));
-        else printf("PENTRU %d ELEMENTE BOGOSORT A FOST INSTANT!\n",i);
-
+        if (cpu_time_used >= 60*60*24*365.25) printf("PENTRU %d ELEMENTE BOGOSORT A DURAT %f ANI!\n", i, cpu_time_used/(60*60*24*365.25));
+        else if (cpu_time_used >= 60*60*24*30) printf("PENTRU %d ELEMENTE BOGOSORT A DURAT %f LUNI!\n", i, cpu_time_used/(60*60*24*30));
+        else if (cpu_time_used >= 60*60*24*7) printf("PENTRU %d ELEMENTE BOGOSORT A DURAT %f SAPTAMANI!\n", i, cpu_time_used/(60*60*24*7));
+        else if (cpu_time_used >= 60*60*24) printf("PENTRU %d ELEMENTE BOGOSORT A DURAT %f ZILE!\n", i, cpu_time_used/(60*60*24));
+        else if (cpu_time_used >= 60*60) printf("PENTRU %d ELEMENTE BOGOSORT A DURAT %f ORE!\n", i, cpu_time_used/(60*60));
+        else if (cpu_time_used >= 60) printf("PENTRU %d ELEMENTE BOGOSORT A DURAT %f MINUTE!\n", i, cpu_time_used/60);
+        else if (cpu_time_used >= 1) printf("PENTRU %d ELEMENTE BOGOSORT A DURAT %f SECUNDE!\n", i, cpu_time_used);
+        else if (cpu_time_used >= 0.001) printf("PENTRU %d ELEMENTE BOGOSORT A DURAT %f MILISECUNDE!\n", i, 1000 * cpu_time_used);
+        else if (cpu_time_used >= 0.000001) printf("PENTRU %d ELEMENTE BOGOSORT A DURAT %f MICROSECUNDE!\n", i, 1000000 * cpu_time_used);
+        else if (cpu_time_used >= 0.000000001) printf("PENTRU %d ELEMENTE BOGOSORT A DURAT %f NANOOSECUNDE!\n", i, 1000000000 * cpu_time_used);
+        else if (cpu_time_used != 0) printf("PENTRU %d ELEMENTE BOGOSORT A DURAT %f PICOSECUNDE!\n", i, 1000000000000 * cpu_time_used);
+        else printf("PENTRU %d ELEMENTE BOGOSORT A FOST INSTANT!\n", i);
         if (iter>0) {
             printf("A fost nevoie de %d incercari de shuffle\n",iter);
             if(cpu_time_used>0)printf("Asta inseamna %f shuffles/second\n", (double)iter/cpu_time_used);
+            
+
+            if ((unsigned long long)iter < fact) {
+                printf("Esti norocos! Ai avut %d iteratii, dar media e %llu. Mai norocos cu %d%% decat media!\n", iter, fact, (int)((fact/iter)*100));
+            } else if ((unsigned long long)iter > fact) {
+                printf("Esti ghinionist! Ai avut %d iteratii, dar media e %llu. Mai ghinionist cu %d%% decat media!\n", iter, fact,(int)((iter/fact)*100));
+            } else {
+                printf("Wow, ai nimerit exact sansa matematica! Ai avut %d iteratii, adica %llu in medie.\n", iter, fact);
+            }
         }
         else printf("S-a nimerit ca sirul sa fie direct ordonat, n-a fost nevoie de nicio incercare de shuffle!\n");
         start = clock();
@@ -135,23 +193,40 @@ int main()
         qs = ((double) (end - start)) / CLOCKS_PER_SEC;
         if(qs<cpu_time_used)
         {
-            if(cpu_time_used-qs>1) printf("Quicksort a fost cu %f secunde mai rapid\n\n",cpu_time_used-qs);
-            else if(cpu_time_used-qs>0.001) printf("Quicksort a fost cu %f milisecunde mai rapid\n\n",1000*(cpu_time_used-qs));
-            else if(cpu_time_used-qs>0.000001) printf("Quicksort a fost cu %f microsecunde mai rapid\n\n",1000000*(cpu_time_used-qs));
-            else if(cpu_time_used-qs>0.000000001) printf("Quicksort a fost cu %f nanosecunde mai rapid\n\n",1000000000*(cpu_time_used-qs));
-            else printf("Quicksort a fost cu %f picosecunde mai rapid\n\n",1000000000000*(cpu_time_used-qs));
+            double diff_qs = cpu_time_used - qs;
+            if (diff_qs >= 60*60*24*365.25) printf("Quicksort a fost cu %f ANI mai rapid\n\n", diff_qs/(60*60*24*365.25));
+            else if (diff_qs >= 60*60*24*30) printf("Quicksort a fost cu %f LUNI mai rapid\n\n", diff_qs/(60*60*24*30));
+            else if (diff_qs >= 60*60*24*7) printf("Quicksort a fost cu %f SAPTAMANI mai rapid\n\n", diff_qs/(60*60*24*7));
+            else if (diff_qs >= 60*60*24) printf("Quicksort a fost cu %f ZILE mai rapid\n\n", diff_qs/(60*60*24));
+            else if (diff_qs >= 60*60) printf("Quicksort a fost cu %f ORE mai rapid\n\n", diff_qs/(60*60));
+            else if (diff_qs >= 60) printf("Quicksort a fost cu %f MINUTE mai rapid\n\n", diff_qs/60);
+            else if (diff_qs >= 1) printf("Quicksort a fost cu %f SECUNDE mai rapid\n\n", diff_qs);
+            else if (diff_qs >= 0.001) printf("Quicksort a fost cu %f MILISECUNDE mai rapid\n\n", 1000 * diff_qs);
+            else if (diff_qs >= 0.000001) printf("Quicksort a fost cu %f MICROSECUNDE mai rapid\n\n", 1000000 * diff_qs);
+            else if (diff_qs >= 0.000000001) printf("Quicksort a fost cu %f NANOOSECUNDE mai rapid\n\n", 1000000000 * diff_qs);
+            else if (diff_qs != 0) printf("Quicksort a fost cu %f PICOSECUNDE mai rapid\n\n", 1000000000000 * diff_qs);
+            else printf("EGALITATE DE TIMP CU QUICKSORT!\n\n");
+
         }
         else if(cpu_time_used==qs)
         {
             printf("EGALITATE DE TIMP CU QUICKSORT!\n\n");
         }
         else if(cpu_time_used<qs)
-        {
-            if(qs-cpu_time_used>1) printf("SUNTETI EXTREM DE NOROCOS! BOGOSORT A ARANJAT ARRAY-UL MAI REPEDE DECAT QUICKSORT CU %f SECUNDE!!!\n", qs-cpu_time_used);
-            else if(qs-cpu_time_used>0.001) printf("SUNTETI EXTREM DE NOROCOS! BOGOSORT A ARANJAT ARRAY-UL MAI REPEDE DECAT QUICKSORT CU %f MILISECUNDE!!!\n", 1000*(qs-cpu_time_used));
-            else if(qs-cpu_time_used>0.000001) printf("SUNTETI EXTREM DE NOROCOS! BOGOSORT A ARANJAT ARRAY-UL MAI REPEDE DECAT QUICKSORT CU %f MICROSECUNDE!!!\n", 1000000*(qs-cpu_time_used));
-            else if(qs-cpu_time_used>0.000000001) printf("SUNTETI EXTREM DE NOROCOS! BOGOSORT A ARANJAT ARRAY-UL MAI REPEDE DECAT QUICKSORT CU %f NANOSECUNDE!!!\n", 1000000000*(qs-cpu_time_used));
-            else printf("SUNTETI EXTREM DE NOROCOS! BOGOSORT A ARANJAT ARRAY-UL MAI REPEDE DECAT QUICKSORT CU %f PICOSECUNDE!!!\n", 1000000000000*(qs-cpu_time_used));
+        {//aici sincer e foarte unlikely sa fie nevoie vreodata de supraunitati ale secundei, dar le-am pus sa fie
+            double diff_bo = qs - cpu_time_used;
+            if (diff_bo >= 60*60*24*365.25) printf("SUNTETI EXTREM DE NOROCOS! BOGOSORT A ARANJAT ARRAY-UL MAI REPEDE DECAT QUICKSORT CU %f ANI!!!\n", diff_bo/(60*60*24*365.25));
+            else if (diff_bo >= 60*60*24*30) printf("SUNTETI EXTREM DE NOROCOS! BOGOSORT A ARANJAT ARRAY-UL MAI REPEDE DECAT QUICKSORT CU %f LUNI!!!\n", diff_bo/(60*60*24*30));
+            else if (diff_bo >= 60*60*24*7) printf("SUNTETI EXTREM DE NOROCOS! BOGOSORT A ARANJAT ARRAY-UL MAI REPEDE DECAT QUICKSORT CU %f SAPTAMANI!!!\n", diff_bo/(60*60*24*7));
+            else if (diff_bo >= 60*60*24) printf("SUNTETI EXTREM DE NOROCOS! BOGOSORT A ARANJAT ARRAY-UL MAI REPEDE DECAT QUICKSORT CU %f ZILE!!!\n", diff_bo/(60*60*24));
+            else if (diff_bo >= 60*60) printf("SUNTETI EXTREM DE NOROCOS! BOGOSORT A ARANJAT ARRAY-UL MAI REPEDE DECAT QUICKSORT CU %f ORE!!!\n", diff_bo/(60*60));
+            else if (diff_bo >= 60) printf("SUNTETI EXTREM DE NOROCOS! BOGOSORT A ARANJAT ARRAY-UL MAI REPEDE DECAT QUICKSORT CU %f MINUTE!!!\n", diff_bo/60);
+            else if (diff_bo >= 1) printf("SUNTETI EXTREM DE NOROCOS! BOGOSORT A ARANJAT ARRAY-UL MAI REPEDE DECAT QUICKSORT CU %f SECUNDE!!!\n", diff_bo);
+            else if (diff_bo >= 0.001) printf("SUNTETI EXTREM DE NOROCOS! BOGOSORT A ARANJAT ARRAY-UL MAI REPEDE DECAT QUICKSORT CU %f MILISECUNDE!!!\n", 1000 * diff_bo);
+            else if (diff_bo >= 0.000001) printf("SUNTETI EXTREM DE NOROCOS! BOGOSORT A ARANJAT ARRAY-UL MAI REPEDE DECAT QUICKSORT CU %f MICROSECUNDE!!!\n", 1000000 * diff_bo);
+            else if (diff_bo >= 0.000000001) printf("SUNTETI EXTREM DE NOROCOS! BOGOSORT A ARANJAT ARRAY-UL MAI REPEDE DECAT QUICKSORT CU %f NANOSECUNDE!!!\n", 1000000000 * diff_bo);
+            else printf("SUNTETI EXTREM DE NOROCOS! BOGOSORT A ARANJAT ARRAY-UL MAI REPEDE DECAT QUICKSORT CU %f PICOSECUNDE!!!\n", 1000000000000 * diff_bo);
+
         }
     }
 
