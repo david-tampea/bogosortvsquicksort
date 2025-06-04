@@ -42,6 +42,20 @@ int bogosort(int arr[], int n) {
     return k;
 }
 
+int bogosortpetimp(int arr[], int n, double qs, clock_t start) {//returneaza 1 la succes si 0 la esec
+    int k=0;
+    clock_t inter;
+    double timp;
+    while (!is_sorted(arr, n)) {
+        if(k++%4==0)srand(time(NULL));//poate ajuta
+        shuffle(arr, n);
+        inter=clock();
+        timp= ((double) (inter - start)) / CLOCKS_PER_SEC;
+        if(timp>qs) return 0;
+    }
+    return 1;
+}
+
 int isinarr(int el, int n, int arr[n])
 {
     for(int i=0; i<n; i++)
@@ -83,12 +97,12 @@ int main()
     clock_t start, end;
     double cpu_time_used, qs;
     int w=0,iter=0, NMAX=0,dist=-1;
-    printf("Ati dori sa incercati bogosort pe:\n1.Un singur array generat aleator\n2.Incepand de la 2 elemente pana la un numar decis de dvs\noptiune: ");
+    printf("Ati dori sa incercati bogosort pe:\n1.Un singur array generat aleator\n2.Incepand de la 2 elemente pana la un numar decis de dvs\n3.Pe un array generat aleator, la infinit, pana scoate timp mai bun decat quicksort\noptiune: ");
     int opt=0;
-    while(opt!=1&&opt!=2)
+    while(opt!=1&&opt!=2&&opt!=3)
     {
         scanf("%d",&opt);
-        if(opt!=1&&opt!=2) printf("1 sau 2!\noptiune: ");
+        if(opt!=1&&opt!=2&&opt!=3) printf("1, 2 sau 3!\noptiune: ");
     }
     printf("Numerele generate vor fi de la 0 la: ");
     while(NMAX<4)
@@ -103,7 +117,7 @@ int main()
         scanf("%d",&dist);
         if(dist!=0&&dist!=1) printf("0 sau 1!\noptiune: ");
     }
-    if(opt==1)printf("Un sir de cate elemente aleatoare doriti sa ordonati?\nans: ");
+    if(opt==1||opt==3)printf("Un sir de cate elemente aleatoare doriti sa ordonati?\nans: ");
     if(opt==2)printf("De la 2 pana la un sir de cate elemente aleatoare doriti sa mergeti?\nans: ");
     while(w<3||((w>(NMAX-1))&&dist!=0))
     {
@@ -112,6 +126,8 @@ int main()
         if((w>(NMAX-1))&&dist!=0) printf("Maxim %d!\nans: ",NMAX-1);//daca sunt distincte nu vom putea genera de dimensiuni mai mari decat nmax
     }
     printf("\n");
+    if(opt==1||opt==2)
+    {
     for(int i=2; i<=w; i++)
     {
         if(opt==1) i=w;//practic asa dam si skip la for
@@ -228,5 +244,50 @@ int main()
         }
     }
 
-    
+}
+else if (opt==3)
+{
+    int i=w, win=0, k=0;
+    long long int incercare=0;
+    int arr[i],arraux[i],auxi[i];
+    double bg=0;
+    printf("Se incearca   ");
+    do{
+        if(k++%4==0) {
+            printf("\b\b\b");
+            srand(time(NULL));//poate ajuta
+        }
+        else printf(".");
+        gen_rand_arr(i,arr,NMAX,dist);
+        for(int j=0; j<i; j++)
+        {
+            arraux[j]=arr[j];//pt qsort
+            auxi[j]=arr[j];//pt a tine minte initial
+        }
+        //printf("Sir de %d elemente amestecat: \n",i);
+        //afis(i,arr);
+        //am renuntat la print-uri ca erau prea multe, am inlocuit cu animatia de "..."
+        start = clock();
+        qsort(arraux,i,sizeof(int),compare_ints);
+        end = clock();
+        qs = ((double) (end - start)) / CLOCKS_PER_SEC;//time to beat
+        start = clock();
+        win = bogosortpetimp(arr,i,qs,start);
+        end = clock();
+        bg = ((double) (end - start)) / CLOCKS_PER_SEC;
+        incercare++;
+    }while(win==0);
+for(int i=0; i<k%4; i++) printf("\b");//sa curat punctele ramase sper
+printf("\nSir initial de %d elemente amestecat: \n",i);
+afis(i,auxi);
+printf("Sir de %d elemente sortat prin bogosort:\n",i);
+afis(i,arr);
+if(is_sorted(auxi,i)) printf("Ati avut noroc, sirul s-a generat direct sortat, totusi ");
+if(win) {printf("FELICITARI, ATI ");
+    if(bg>qs) printf("BATUT");
+    else if(bg==qs) printf("EGALAT");
+    else printf("WTF");//N-AR TREBUI SA AJUNGA AIVI DIN MOMENT CE A IESIT DIN WHILE
+ printf(" QUICKSORT-UL DIN INCERCAREA A %lld-A!\n",incercare);//nu mai am chef sa scriu cu cate mili micro nano secunde
+}
+}
 }
